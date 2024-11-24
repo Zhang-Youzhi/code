@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>通讯录</title>
+    <link href="https://cdn.staticfile.org/twitter-bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.staticfile.org/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://cdn.staticfile.org/popper.js/1.15.0/umd/popper.min.js"></script>
+    <script src="https://cdn.staticfile.org/twitter-bootstrap/4.3.1/js/bootstrap.min.js"></script>
+</head>
+<body>
+
+<div class="container">
+    <h2>通讯录</h2>
+    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#myModal">
+        添加联系人
+    </button>
+
+    <table class="table">
+        <thead>
+        <tr>
+            <th>属性</th>
+            <th>内容</th>
+            <th>操作</th>
+        </tr>
+        </thead>
+        <tbody id="contactsList">
+        <!-- 联系人列表将在这里填充 -->
+        <tr>
+            <td>座机</td>
+            <td>111</td>
+            <td>
+                <button class="btn btn-danger btn-sm">删除</button>
+            </td>
+        </tr>
+        <tr>
+            <td>邮箱</td>
+            <td>222</td>
+            <td>
+                <button class="btn btn-danger btn-sm">删除</button>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+
+<!-- 模态框 -->
+<div class="modal fade" id="myModal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">添加联系属性</h4>
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="contactForm">
+                    <div class="form-group">
+                        <label for="name">属性:</label>
+                        <input type="text" class="form-control" id="name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="value">内容:</label>
+                        <input type="text" class="form-control" id="value" required>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" id="addContact">添加</button>
+                <button type="button" class="btn btn-danger" data-dismiss="modal">关闭</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 在模态框的下面添加这段JavaScript代码 -->
+<script>
+    // JavaScript代码
+    document.getElementById('addContact').addEventListener('click', function () {
+        var name = document.getElementById('name').value;
+        var value = document.getElementById('value').value;
+
+        if (name && value) { // 确保属性和内容不为空
+            // 创建删除按钮
+            var deleteBtn = document.createElement('button');
+            deleteBtn.className = 'btn btn-danger btn-sm';
+            deleteBtn.textContent = '删除';
+            deleteBtn.onclick = function () {
+                this.parentNode.parentNode.remove(); // 删除按钮的父元素的父元素，即<tr>
+            };
+
+            // 创建表格行和单元格
+            var tbody = document.getElementById('contactsList');
+            var tr = document.createElement('tr');
+            var tdName = document.createElement('td');
+            var tdValue = document.createElement('td');
+            var tdAction = document.createElement('td');
+
+            // 设置单元格内容
+            tdName.textContent = name;
+            tdValue.textContent = value;
+            tdAction.appendChild(deleteBtn);
+
+            // 将单元格添加到行中
+            tr.appendChild(tdName);
+            tr.appendChild(tdValue);
+            tr.appendChild(tdAction);
+
+            // 将行添加到表格中
+            tbody.appendChild(tr);
+
+            // 清空输入框
+            document.getElementById('name').value = "";
+            document.getElementById('value').value = "";
+
+            // 关闭模态框
+            $('#myModal').modal('hide');
+        }
+    });
+
+
+    // 函数：将表格转换为JSON
+    function tableToJson() {
+        var table = document.getElementById('contactsList');
+        var rows = table.rows;
+        var jsonData = [];
+
+        for (var i = 0; i < rows.length; i++) {
+            var row = rows[i];
+            var cellName = row.cells[0].textContent;
+            var cellValue = row.cells[1].textContent;
+            jsonData.push({name: cellName, value: cellValue});
+        }
+
+        return jsonData;
+    }
+
+    // 函数：将JSON转换为表格
+    function jsonToTable(jsonData) {
+        var table = document.getElementById('contactsList');
+        table.innerHTML = ''; // 清空现有表格内容
+
+        jsonData.forEach(function (item) {
+            var row = table.insertRow(-1); // 在表格末尾添加一行
+            var cellName = row.insertCell(0);
+            var cellValue = row.insertCell(1);
+            var cellAction = row.insertCell(2);
+
+            cellName.textContent = item.name;
+            cellValue.textContent = item.value;
+
+            // 创建删除按钮
+            var deleteBtn = document.createElement('button');
+            deleteBtn.className = 'btn btn-danger btn-sm';
+            deleteBtn.textContent = '删除';
+            deleteBtn.onclick = function () {
+                this.parentNode.parentNode.remove(); // 删除按钮的父元素的父元素，即<tr>
+            };
+            cellAction.appendChild(deleteBtn);
+        });
+    }
+
+    var jsonData = tableToJson();
+
+    console.log(jsonData)
+
+    jsonToTable(jsonData); // 你可以根据需要调用这个函数来重新生成表格
+
+
+</script>
+
+
+</body>
+</html>
